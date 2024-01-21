@@ -39,10 +39,10 @@ $ yarn install
 $ yarn run start
 
 # watch mode
-$ yarn run start:dev
+$ yarn run dev
 
 # production mode
-$ yarn run start:prod
+$ yarn run prod
 ```
 
 ## Test
@@ -52,10 +52,10 @@ $ yarn run start:prod
 $ yarn run test
 
 # e2e tests
-$ yarn run test:e2e
+$ yarn run test-e2e
 
 # test coverage
-$ yarn run test:cov
+$ yarn run test-cov
 ```
 
 ## Support
