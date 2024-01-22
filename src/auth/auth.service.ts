@@ -7,10 +7,13 @@ import {UserModel} from "../user/user.model";
 import {AuthDto} from "./dto/auth.dto";
 import {UserDto} from "../user/dto/user.dto";
 
+import {JwtService} from "@nestjs/jwt";
+
 @Injectable()
 export class AuthService {
     constructor(
-        @InjectModel(UserModel) private readonly userModel: ModelType<UserModel>
+        @InjectModel(UserModel) private readonly userModel: ModelType<UserModel>,
+        private readonly jwtService: JwtService
     ) {
     }
 
@@ -19,7 +22,15 @@ export class AuthService {
         return await hash(password, salt);
     }
 
-    async register(dto: AuthDto): Promise<UserDto> {
+    async register(dto: AuthDto): Promise<{
+        id: string;
+        email: string;
+        name: string;
+        isAdmin: boolean;
+        favorites: [];
+        accessToken: string;
+        refreshToken: string;
+    }> {
         const isUserExist: UserModel = await this.userModel.findOne({email: dto.email})
         if (isUserExist) {
             throw new BadRequestException(`User with email - ${dto.email} is already exist !`);
@@ -34,10 +45,24 @@ export class AuthService {
         });
         await user.save()
 
-        return new UserDto(user.email, user.name, user.isAdmin, user.favorites);
+        const userDTO: UserDto = new UserDto(String(user._id), user.email, user.name, user.isAdmin, user.favorites);
+        const tokens: { accessToken: string, refreshToken: string } = await this.generateTokens(userDTO);
+
+        return {
+            ...userDTO,
+            ...tokens
+        };
     }
 
-    async login(dto: AuthDto): Promise<UserDto> {
+    async login(dto: AuthDto): Promise<{
+        id: string;
+        email: string;
+        name: string;
+        isAdmin: boolean;
+        favorites: [];
+        accessToken: string;
+        refreshToken: string;
+    }> {
         const user: UserModel = await this.userModel.findOne({email: dto.email})
         if (!user) {
             throw new BadRequestException(`User with email - ${dto.email} is not found !`);
@@ -48,6 +73,28 @@ export class AuthService {
             throw new BadRequestException(`Invalid password !`);
         }
 
-        return new UserDto(user.email, user.name, user.isAdmin, user.favorites);
+        const userDTO: UserDto = new UserDto(String(user._id), user.email, user.name, user.isAdmin, user.favorites);
+        const tokens: {accessToken: string, refreshToken: string} = await this.generateTokens(userDTO);
+
+        return{
+            ...userDTO,
+            ...tokens
+        };
+    }
+
+    async generateTokens(userDTO: UserDto): Promise<{ accessToken: string, refreshToken: string }> {
+        const data: object = {_id: userDTO.id};
+
+        const accessToken: string = await this.jwtService.signAsync(data, {
+            expiresIn: "30m"
+        })
+        const refreshToken: string = await this.jwtService.signAsync(data, {
+            expiresIn: "30d"
+        })
+
+        return {
+            accessToken,
+            refreshToken
+        }
     }
 }
