@@ -8,9 +8,9 @@ import { User } from './decorators/user.decorator';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get('/:id')
+  @Get('/profile')
   @Auth()
-  async getById(@User('_id') _id: string) {
-    return await this.userService.getById(_id);
+  async getProfile(@User('_id') _id: string) {
+    return await this.userService.getProfile(_id);
   }
 }

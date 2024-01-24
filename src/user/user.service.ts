@@ -3,13 +3,12 @@ import { InjectModel } from 'nestjs-typegoose';
 import { UserModel } from './user.model';
 import { ModelType } from '@typegoose/typegoose/lib/types';
 import { UserDto } from './dto/user.dto';
-import { use } from 'passport';
 
 @Injectable()
 export class UserService {
   constructor(@InjectModel(UserModel) private readonly userModel: ModelType<UserModel>) {}
 
-  async getById(_id: string): Promise<UserDto> {
+  async getProfile(_id: string): Promise<UserDto> {
     if (!_id) {
       throw new BadRequestException("User's id not received !");
     }
