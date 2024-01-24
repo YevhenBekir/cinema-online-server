@@ -18,7 +18,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async generatePassword(password: string): Promise<string> {
+  private async generatePassword(password: string): Promise<string> {
     const salt: string = await genSalt(5);
     return await hash(password, salt);
   }

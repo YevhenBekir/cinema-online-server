@@ -1,10 +1,19 @@
+import { IsBoolean, IsEmail, IsString } from 'class-validator';
 import { UserModel } from '../user.model';
 
 export class UserDto {
+  @IsString()
   id: string;
+
+  @IsEmail()
   email: string;
+
+  @IsString()
   name: string;
+
+  @IsBoolean()
   isAdmin: boolean;
+
   favorites: [];
 
   constructor(userModel: UserModel) {
