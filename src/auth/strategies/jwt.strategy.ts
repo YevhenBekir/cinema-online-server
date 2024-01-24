@@ -13,14 +13,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly configService: ConfigService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken,
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: true,
       secretOrKey: configService.get('JWT_SECRET'),
     });
   }
 
   async validate({ _id }: Pick<UserModel, '_id'>) {
-    // Method for check user in DB with '_id'
-    return await this.userModel.findOne({ _id }).exec();
+    // Method for check user in DB with '_id'. This method calls when jwtService.verifyAsync(refreshToken). '_id' passed from token token during verify.
+    return await this.userModel.findById(_id).exec();
   }
 }

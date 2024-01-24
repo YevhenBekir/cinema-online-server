@@ -23,30 +23,25 @@ export class AuthService {
     return await hash(password, salt);
   }
 
-  async register(dto: AuthDto): Promise<AuthenticatedUserDto> {
+  async register(authDTO: AuthDto): Promise<AuthenticatedUserDto> {
     const isUserExist: UserModel = await this.userModel.findOne({
-      email: dto.email,
+      email: authDTO.email,
     });
     if (isUserExist) {
-      throw new BadRequestException(`User with email - ${dto.email} is already exist !`);
+      throw new BadRequestException(`User with email - ${authDTO.email} is already exist !`);
     }
 
-    const hashPassword: string = await this.generatePassword(dto.password);
+    const hashPassword: string = await this.generatePassword(authDTO.password);
 
     const user = new this.userModel({
-      email: dto.email,
-      name: dto.name,
+      email: authDTO.email,
+      name: authDTO.name,
       password: hashPassword,
     });
     await user.save();
 
-    const userDTO: UserDto = new UserDto(
-      String(user._id),
-      user.email,
-      user.name,
-      user.isAdmin,
-      user.favorites,
-    );
+    const userDTO: UserDto = new UserDto(user);
+
     const tokens: { accessToken: string; refreshToken: string } = await this.generateTokens(
       userDTO.id,
     );
@@ -67,13 +62,8 @@ export class AuthService {
       throw new BadRequestException(`Invalid password !`);
     }
 
-    const userDTO: UserDto = new UserDto(
-      String(user._id),
-      user.email,
-      user.name,
-      user.isAdmin,
-      user.favorites,
-    );
+    const userDTO: UserDto = new UserDto(user);
+
     const tokens: { accessToken: string; refreshToken: string } = await this.generateTokens(
       userDTO.id,
     );
@@ -84,7 +74,7 @@ export class AuthService {
   }
 
   async generateTokens(userID: string): Promise<{ accessToken: string; refreshToken: string }> {
-    const data: object = { id: userID };
+    const data: object = { _id: userID };
 
     const accessToken: string = await this.jwtService.signAsync(data, {
       expiresIn: '30m',
@@ -112,7 +102,7 @@ export class AuthService {
     }
 
     const user: UserModel = await this.userModel.findOne({
-      _id: verifiedRefreshToken.id,
+      _id: verifiedRefreshToken._id,
     });
 
     const tokens: { accessToken: string; refreshToken: string } = await this.generateTokens(
