@@ -1,4 +1,15 @@
-import { Body, Controller, Get, HttpCode, Param, Put, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Put,
+  Query,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 
 import { UserService } from './user.service';
 import { Auth } from '../auth/decorators/auth.decorator';
@@ -10,16 +21,28 @@ import { IdValidationPipe } from 'src/pipes/id.validation.pipe';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Get('/count')
+  @Auth('admin')
+  async getUsersCount() {
+    return await this.userService.getUsersCount();
+  }
+
+  @Get('/all')
+  @Auth('admin')
+  async getAllUsers(@Query('searchTerm') searchTerm?: string) {
+    return await this.userService.getAllUsers(searchTerm);
+  }
+
   @Get('/profile')
   @Auth()
   async getProfile(@User('_id') _id: string) {
     return await this.userService.getProfile(_id);
   }
 
-  @Get('/users-count')
+  @Get('/profile/:_userId')
   @Auth('admin')
-  async getUsersCount() {
-    return await this.userService.getUsersCount();
+  async getUserProfile(@Param('_userId') _userId: string) {
+    return await this.userService.getProfile(_userId);
   }
 
   @UsePipes(new ValidationPipe())
@@ -34,10 +57,17 @@ export class UserController {
   @Put('/update/:_userId')
   @HttpCode(200)
   @Auth('admin')
-  async updateUser(
+  async updateUserProfile(
     @Param('_userId', IdValidationPipe) _userId: string, // Get '_userId' and validate with custom pipe for ObjectId in MongoDB
     @Body() userUpdateDTO: UserUpdateDto,
   ) {
     return await this.userService.updateProfile(_userId, userUpdateDTO);
+  }
+
+  @Delete('/delete/:_userId')
+  @HttpCode(200)
+  @Auth('admin')
+  async deleteUser(@Param('_userId', IdValidationPipe) _userId: string) {
+    return await this.userService.deleteUser(_userId);
   }
 }

@@ -23,6 +23,26 @@ export class AuthService {
     return await hash(password, salt);
   }
 
+  async login(dto: AuthDto): Promise<AuthenticatedUserDto> {
+    const user: UserModel = await this.userModel.findOne({ email: dto.email });
+    if (!user) {
+      throw new BadRequestException(`User with email - ${dto.email} is not found !`);
+    }
+
+    const isValidPassword: boolean = await compare(dto.password, user.password);
+    if (!isValidPassword) {
+      throw new BadRequestException(`Invalid password !`);
+    }
+
+    const userDTO: UserDto = new UserDto(user);
+
+    const tokens: { accessToken: string; refreshToken: string } = await this.generateTokens(userDTO.id);
+
+    const authenticatedUserDTO: AuthenticatedUserDto = new AuthenticatedUserDto(userDTO, tokens);
+
+    return authenticatedUserDTO;
+  }
+
   async register(authDTO: AuthDto): Promise<AuthenticatedUserDto> {
     const isUserExist: UserModel = await this.userModel.findOne({
       email: authDTO.email,
@@ -42,31 +62,7 @@ export class AuthService {
 
     const userDTO: UserDto = new UserDto(user);
 
-    const tokens: { accessToken: string; refreshToken: string } = await this.generateTokens(
-      userDTO.id,
-    );
-
-    const authenticatedUserDTO: AuthenticatedUserDto = new AuthenticatedUserDto(userDTO, tokens);
-
-    return authenticatedUserDTO;
-  }
-
-  async login(dto: AuthDto): Promise<AuthenticatedUserDto> {
-    const user: UserModel = await this.userModel.findOne({ email: dto.email });
-    if (!user) {
-      throw new BadRequestException(`User with email - ${dto.email} is not found !`);
-    }
-
-    const isValidPassword: boolean = await compare(dto.password, user.password);
-    if (!isValidPassword) {
-      throw new BadRequestException(`Invalid password !`);
-    }
-
-    const userDTO: UserDto = new UserDto(user);
-
-    const tokens: { accessToken: string; refreshToken: string } = await this.generateTokens(
-      userDTO.id,
-    );
+    const tokens: { accessToken: string; refreshToken: string } = await this.generateTokens(userDTO.id);
 
     const authenticatedUserDTO: AuthenticatedUserDto = new AuthenticatedUserDto(userDTO, tokens);
 
@@ -105,9 +101,7 @@ export class AuthService {
       _id: verifiedRefreshToken._id,
     });
 
-    const tokens: { accessToken: string; refreshToken: string } = await this.generateTokens(
-      String(user._id),
-    );
+    const tokens: { accessToken: string; refreshToken: string } = await this.generateTokens(String(user._id));
 
     return tokens;
   }

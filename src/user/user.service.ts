@@ -48,11 +48,40 @@ export class UserService {
     }
   }
 
+  async getUsersCount(): Promise<number> {
+    return await this.userModel.find().countDocuments().exec();
+  }
+
   async getProfile(_id: string): Promise<UserDto> {
     const user: UserModel & Document = await this.findUserById(_id);
     const userDTO: UserDto = new UserDto(user);
 
     return userDTO;
+  }
+
+  async getAllUsers(searchTerm: string): Promise<UserDto[]> {
+    let filter: object = {};
+
+    if (searchTerm) {
+      filter = {
+        $or: [{ email: new RegExp(searchTerm, 'i') }, { name: new RegExp(searchTerm, 'i') }],
+      };
+    }
+
+    const result: UserModel[] = await this.userModel
+      .find(filter)
+      .sort({
+        createdAt: 'desc', // Sorting for new users
+      })
+      .exec();
+
+    if (result.length === 0) {
+      throw new NotFoundException('No users found !');
+    }
+
+    const usersDTO: UserDto[] = result.map((user) => new UserDto(user));
+
+    return usersDTO;
   }
 
   async updateProfile(_id: string, { email, name, password, isAdmin }: UserUpdateDto): Promise<UserDto> {
@@ -74,7 +103,7 @@ export class UserService {
     return new UserDto(user);
   }
 
-  async getUsersCount(): Promise<number> {
-    return await this.userModel.find().countDocuments().exec();
+  async deleteUser(_id: string): Promise<UserModel | null> {
+    return await this.userModel.findByIdAndDelete(_id).exec();
   }
 }
