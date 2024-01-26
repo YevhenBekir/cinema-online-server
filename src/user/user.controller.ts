@@ -34,27 +34,29 @@ export class UserController {
   }
 
   @Get('/profile')
+  @UsePipes(new ValidationPipe())
   @Auth()
-  async getProfile(@User('_id') _id: string) {
+  async getProfile(@User('_id', IdValidationPipe) _id: string) {
     return await this.userService.getProfile(_id);
   }
 
   @Get('/profile/:_userId')
+  @UsePipes(new ValidationPipe())
   @Auth('admin')
-  async getUserProfile(@Param('_userId') _userId: string) {
+  async getUserProfile(@Param('_userId', IdValidationPipe) _userId: string) {
     return await this.userService.getProfile(_userId);
   }
 
-  @UsePipes(new ValidationPipe())
   @Put('/update')
+  @UsePipes(new ValidationPipe())
   @HttpCode(200)
   @Auth()
-  async updateProfile(@User('_id') _id: string, @Body() userUpdateDTO: UserUpdateDto) {
+  async updateProfile(@User('_id', IdValidationPipe) _id: string, @Body() userUpdateDTO: UserUpdateDto) {
     return await this.userService.updateProfile(_id, userUpdateDTO);
   }
 
-  @UsePipes(new ValidationPipe())
   @Put('/update/:_userId')
+  @UsePipes(new ValidationPipe())
   @HttpCode(200)
   @Auth('admin')
   async updateUserProfile(
@@ -65,6 +67,7 @@ export class UserController {
   }
 
   @Delete('/delete/:_userId')
+  @UsePipes(new ValidationPipe())
   @HttpCode(200)
   @Auth('admin')
   async deleteUser(@Param('_userId', IdValidationPipe) _userId: string) {

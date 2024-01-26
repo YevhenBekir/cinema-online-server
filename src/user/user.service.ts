@@ -75,7 +75,7 @@ export class UserService {
       })
       .exec();
 
-    if (result.length === 0) {
+    if (!result.length) {
       throw new NotFoundException('No users found !');
     }
 
