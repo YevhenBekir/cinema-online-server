@@ -24,12 +24,9 @@ export class GenreService {
       };
     }
 
-    const genres: GenreModel[] = await this.genreModel
-      .find(filter)
-      .sort({
-        createdAt: 'desc',
-      })
-      .exec();
+    const genres: GenreModel[] = await this.genreModel.find(filter).sort({
+      createdAt: 'desc',
+    });
 
     if (!genres.length) {
       return false;
@@ -55,12 +52,9 @@ export class GenreService {
       };
     }
 
-    const genres: GenreModel[] = await this.genreModel
-      .find(filter)
-      .sort({
-        createdAt: 'desc',
-      })
-      .exec();
+    const genres: GenreModel[] = await this.genreModel.find(filter).sort({
+      createdAt: 'desc',
+    });
 
     if (!genres.length) {
       throw new NotFoundException('No genres found !');
@@ -78,7 +72,7 @@ export class GenreService {
     return collections;
   }
 
-  async getById(_id: string): Promise<GenreDto> {
+  async byId(_id: string): Promise<GenreDto> {
     const genre: GenreModel = await this.genreModel.findById(_id);
     if (!genre) {
       throw new NotFoundException('No genre found !');
@@ -87,13 +81,13 @@ export class GenreService {
     return new GenreDto(genre);
   }
 
-  async getBySlug(slug: string): Promise<GenreDto> {
+  async bySlug(slug: string): Promise<GenreDto> {
     const genre: GenreModel = await this.genreModel.findOne({ slug });
 
     return new GenreDto(genre);
   }
 
-  async addGenre({ name, description, slug, icon, isSensitive }: GenreDto): Promise<GenreDto> {
+  async create({ name, description, slug, icon, isSensitive }: GenreDto): Promise<GenreDto> {
     const isExist: boolean = await this.findGenre(name);
     if (isExist) {
       throw new BadRequestException(`${name} genre already exist !`);
@@ -112,7 +106,7 @@ export class GenreService {
     return new GenreDto(genre);
   }
 
-  async updateGenre(_id: string, genreDTO: UpdateGenreDto): Promise<GenreDto> {
+  async update(_id: string, genreDTO: UpdateGenreDto): Promise<GenreDto> {
     // This typegoose method will find necessary element in DB and update it (if exist)
     const updatedGenre: GenreDto = await this.genreModel.findByIdAndUpdate(_id, genreDTO, {
       new: true,
@@ -125,7 +119,7 @@ export class GenreService {
     return updatedGenre;
   }
 
-  async removeGenre(_id: string): Promise<GenreDto> {
+  async delete(_id: string): Promise<GenreModel> {
     return await this.genreModel.findByIdAndDelete(_id).exec();
   }
 }

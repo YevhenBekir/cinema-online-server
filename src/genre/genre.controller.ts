@@ -33,15 +33,14 @@ export class GenreController {
   }
 
   @Get('/slug/:slug')
-  async getBySlug(@Param('slug') slug: string) {
-    return await this.genreService.getBySlug(slug);
+  async bySlug(@Param('slug') slug: string) {
+    return await this.genreService.bySlug(slug);
   }
 
   @Get('/id/:_id')
   @Auth('admin')
-  @UsePipes(new ValidationPipe())
-  async getById(@Param('_id', IdValidationPipe) _id: string) {
-    return await this.genreService.getById(_id);
+  async byId(@Param('_id', IdValidationPipe) _id: string) {
+    return await this.genreService.byId(_id);
   }
 
   @Get('/count')
@@ -50,26 +49,25 @@ export class GenreController {
     return await this.genreService.getCount();
   }
 
-  @Post('/add')
+  @Post('/create')
   @HttpCode(200)
   @Auth('admin')
-  async addGenre(@Body() genreDTO: GenreDto) {
-    return await this.genreService.addGenre(genreDTO);
+  async create(@Body() genreDTO: GenreDto) {
+    return await this.genreService.create(genreDTO);
   }
 
   @Put('/update/:_id')
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
   @Auth('admin')
-  async updateGenre(@Param('_id') _id: string, @Body() genreDTO: UpdateGenreDto) {
-    return await this.genreService.updateGenre(_id, genreDTO);
+  async update(@Param('_id') _id: string, @Body() genreDTO: UpdateGenreDto) {
+    return await this.genreService.update(_id, genreDTO);
   }
 
   @Delete('/delete/:_id')
-  @UsePipes(new ValidationPipe())
   @HttpCode(200)
   @Auth('admin')
-  async removeGenre(@Param('_id', IdValidationPipe) _id: string) {
-    return await this.genreService.removeGenre(_id);
+  async delete(@Param('_id', IdValidationPipe) _id: string) {
+    return await this.genreService.delete(_id);
   }
 }

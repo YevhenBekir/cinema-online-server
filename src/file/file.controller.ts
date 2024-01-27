@@ -1,4 +1,13 @@
-import { Controller, HttpCode, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  HttpCode,
+  Post,
+  Query,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { FileService } from './file.service';
@@ -14,5 +23,20 @@ export class FileController {
   @Auth('admin')
   async uploadFiles(@UploadedFile() file: Express.Multer.File, @Query('folder') folder?: string) {
     return await this.fileService.uploadFiles([file], folder);
+  }
+
+  @Post('/upload-single')
+  @UseInterceptors(FileInterceptor('file'))
+  @HttpCode(200)
+  @Auth('admin')
+  async uploadSingleFile(@UploadedFile() file: Express.Multer.File, @Query('folder') folder?: string) {
+    return await this.fileService.uploadSingleFile(file, folder);
+  }
+
+  @Delete('/delete')
+  @HttpCode(200)
+  @Auth('admin')
+  async delete(@Body('filePath') filePath: string) {
+    return await this.fileService.deleteFile(filePath);
   }
 }
