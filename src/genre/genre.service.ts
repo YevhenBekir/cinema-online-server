@@ -5,6 +5,7 @@ import { Document } from 'mongoose';
 
 import { GenreModel } from './genre.model';
 import { GenreDto } from './dto/genre.dto';
+import { UpdateGenreDto } from './dto/updateGenre.dto';
 
 @Injectable()
 export class GenreService {
@@ -41,7 +42,7 @@ export class GenreService {
     return await this.genreModel.find().countDocuments().exec();
   }
 
-  async getAll(searchTerm: string): Promise<GenreDto[]> {
+  async getAll(searchTerm: string = ''): Promise<GenreDto[]> {
     let filter: object = {};
 
     if (searchTerm) {
@@ -68,11 +69,26 @@ export class GenreService {
     return genres.map((genre) => new GenreDto(genre));
   }
 
+  async getCollections() {
+    const genres: GenreDto[] = await this.getAll();
+
+    // TODO: Need to collections return
+    let collections = genres;
+
+    return collections;
+  }
+
   async getById(_id: string): Promise<GenreDto> {
     const genre: GenreModel = await this.genreModel.findById(_id);
     if (!genre) {
       throw new NotFoundException('No genre found !');
     }
+
+    return new GenreDto(genre);
+  }
+
+  async getBySlug(slug: string): Promise<GenreDto> {
+    const genre: GenreModel = await this.genreModel.findOne({ slug });
 
     return new GenreDto(genre);
   }
@@ -83,7 +99,7 @@ export class GenreService {
       throw new BadRequestException(`${name} genre already exist !`);
     }
 
-    const genre = new this.genreModel({
+    const genre: GenreModel & Document = new this.genreModel({
       name,
       slug,
     });
@@ -96,13 +112,17 @@ export class GenreService {
     return new GenreDto(genre);
   }
 
-  async updateGenre(_id: string, genreDTO: GenreDto): Promise<GenreDto> {
-    return await this.genreModel
-      .findByIdAndUpdate(_id, genreDTO, {
-        new: true,
-      })
-      .exec();
-    // This typegoose method will find necessary element in DB and update it
+  async updateGenre(_id: string, genreDTO: UpdateGenreDto): Promise<GenreDto> {
+    // This typegoose method will find necessary element in DB and update it (if exist)
+    const updatedGenre: GenreDto = await this.genreModel.findByIdAndUpdate(_id, genreDTO, {
+      new: true,
+    });
+
+    if (!updatedGenre) {
+      throw new NotFoundException('No genre found !');
+    }
+
+    return updatedGenre;
   }
 
   async removeGenre(_id: string): Promise<GenreDto> {

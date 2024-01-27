@@ -16,7 +16,7 @@ import { GenreService } from './genre.service';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { GenreDto } from './dto/genre.dto';
 import { IdValidationPipe } from '../pipes/id.validation.pipe';
-import { GenreModel } from './genre.model';
+import { UpdateGenreDto } from './dto/updateGenre.dto';
 
 @Controller('genres')
 export class GenreController {
@@ -27,7 +27,18 @@ export class GenreController {
     return await this.genreService.getAll(searchTerm);
   }
 
-  @Get('/get/:_id')
+  @Get('/collections')
+  async getCollections() {
+    return await this.genreService.getCollections();
+  }
+
+  @Get('/slug/:slug')
+  async getBySlug(@Param('slug') slug: string) {
+    return await this.genreService.getBySlug(slug);
+  }
+
+  @Get('/id/:_id')
+  @Auth('admin')
   @UsePipes(new ValidationPipe())
   async getById(@Param('_id', IdValidationPipe) _id: string) {
     return await this.genreService.getById(_id);
@@ -50,7 +61,7 @@ export class GenreController {
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
   @Auth('admin')
-  async updateGenre(@Param('_id') _id: string, @Body() genreDTO: GenreModel) {
+  async updateGenre(@Param('_id') _id: string, @Body() genreDTO: UpdateGenreDto) {
     return await this.genreService.updateGenre(_id, genreDTO);
   }
 

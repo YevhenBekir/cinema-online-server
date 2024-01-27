@@ -1,11 +1,4 @@
-import {
-  IsString,
-  IsEmail,
-  IsBoolean,
-  MinLength,
-  MaxLength,
-  IsOptional,
-} from 'class-validator'; // Validator to DTO variables
+import { IsString, IsEmail, MinLength, MaxLength } from 'class-validator'; // Validator to DTO variables
 
 export class AuthDto {
   @IsEmail()
