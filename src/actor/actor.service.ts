@@ -47,11 +47,29 @@ export class ActorService {
       };
     }
 
-    // TODO: aggregation
+    // Without aggregation
+    // const actors: ActorModel[] = await this.actorModel.find(filter).sort({
+    //   createdAt: 'desc',
+    // });
 
-    const actors: ActorModel[] = await this.actorModel.find(filter).sort({
-      createdAt: 'desc',
-    });
+    const actors = await this.actorModel
+      .aggregate() // making aggregation request
+      .match(filter) // filtering aggregation
+      .lookup({
+        // combines data (elements) from 'Movie' document where Movie.element.actors[...] == currentActor._id. Saving data in new 'movies' column
+        from: 'Movie',
+        foreignField: 'actors',
+        localField: '_id',
+        as: 'movies',
+      })
+      .addFields({
+        // creation new 'moviesCount' where length of new 'movies' column (movies amount)
+        moviesCount: {
+          $size: '$movies',
+        },
+      })
+      .sort({ createdAt: -1 }); // sorting from newer to oldest actors
+
     this.isFound(actors);
 
     return actors.map((actor) => new ActorDto(actor));
