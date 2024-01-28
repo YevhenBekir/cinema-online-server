@@ -46,9 +46,9 @@ export class ActorController {
   @HttpCode(200)
   @Auth('admin')
   async create(@Body() actorDTO: CreateActorDto, @UploadedFile() file?: Express.Multer.File) {
-    if (file) {
-      actorDTO.image = file;
-    }
+    Object.assign(actorDTO, {
+      image: file || actorDTO.image,
+    });
 
     return await this.actorService.create(actorDTO);
   }

@@ -5,8 +5,8 @@ import { ModelType } from '@typegoose/typegoose/lib/types';
 import { ActorModel } from './actor.model';
 import { ActorDto } from './dto/actor.dto';
 import { CreateActorDto } from './dto/createActor.dto';
-import { FileService } from 'src/file/file.service';
-import { FileResponse } from 'src/file/file.interface';
+import { FileService } from '../file/file.service';
+import { FileResponse } from '../file/file.interface';
 
 @Injectable()
 export class ActorService {
@@ -71,7 +71,7 @@ export class ActorService {
     return new ActorDto(actor);
   }
 
-  async create(actorDTO: CreateActorDto): Promise<ActorModel | void> {
+  async create(actorDTO: CreateActorDto): Promise<ActorDto | void> {
     await this.isExist(actorDTO.slug);
 
     let actorImage: FileResponse | undefined;
@@ -85,8 +85,9 @@ export class ActorService {
       slug: actorDTO.slug,
       image: actorImage ? actorImage.url : '',
     });
+    await actor.save();
 
-    return actor.save();
+    return new ActorDto(actor);
   }
 
   async changeImage(_id: string, image: Express.Multer.File): Promise<ActorDto> {
