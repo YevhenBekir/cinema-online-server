@@ -1,4 +1,7 @@
 import { IsBoolean, IsEmail, IsOptional, IsString } from 'class-validator';
+import { Ref } from '@typegoose/typegoose';
+
+import { MovieModel } from 'src/movie/movie.model';
 import { UserDto } from 'src/user/dto/user.dto';
 
 export class AuthenticatedUserDto {
@@ -15,7 +18,7 @@ export class AuthenticatedUserDto {
   isAdmin: boolean;
 
   @IsOptional()
-  favorites: [];
+  favorites: Ref<MovieModel>[];
 
   @IsString()
   accessToken: string;

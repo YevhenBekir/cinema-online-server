@@ -1,12 +1,14 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from 'nestjs-typegoose';
 import { ModelType } from '@typegoose/typegoose/lib/types';
+import { Ref } from '@typegoose/typegoose';
 import { compare, genSalt, hash } from 'bcryptjs';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 import { UserModel } from './user.model';
 import { UserDto } from './dto/user.dto';
 import { UserUpdateDto } from './dto/userUpdate.dto';
+import { MovieModel } from 'src/movie/movie.model';
 
 @Injectable()
 export class UserService {
@@ -27,7 +29,7 @@ export class UserService {
     return isPasswordsAreSimilar;
   }
 
-  private async findUserById(_id: string): Promise<UserModel & Document> {
+  private async findUserById(_id: Types.ObjectId): Promise<UserModel & Document> {
     if (!_id) {
       throw new BadRequestException("User's id not received !");
     }
@@ -52,7 +54,7 @@ export class UserService {
     return await this.userModel.find().countDocuments().exec();
   }
 
-  async getProfile(_id: string): Promise<UserDto> {
+  async getProfile(_id: Types.ObjectId): Promise<UserDto> {
     const user: UserModel & Document = await this.findUserById(_id);
     const userDTO: UserDto = new UserDto(user);
 
@@ -84,7 +86,10 @@ export class UserService {
     return usersDTO;
   }
 
-  async updateProfile(_id: string, { email, name, password, isAdmin }: UserUpdateDto): Promise<UserDto> {
+  async updateProfile(
+    _id: Types.ObjectId,
+    { email, name, password, isAdmin }: UserUpdateDto,
+  ): Promise<UserDto> {
     const user: UserModel & Document = await this.findUserById(_id);
     await this.isEmailAlreadyExist(email);
 
@@ -101,6 +106,30 @@ export class UserService {
     await user.save();
 
     return new UserDto(user);
+  }
+
+  async toggleFavorite({ _id, favorites }: UserModel, _movieId: Types.ObjectId): Promise<boolean> {
+    try {
+      await this.userModel.findByIdAndUpdate(_id, {
+        favorites: favorites.includes(_movieId)
+          ? favorites.filter((singleMovieId) => String(singleMovieId) !== String(_movieId))
+          : [...favorites, _movieId],
+      });
+
+      return true;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async getFavorites(_id: Types.ObjectId): Promise<Ref<MovieModel>[]> {
+    // Return populated user's favorites movies
+    return (await this.userModel.findById(_id, 'favorites'))
+      .populate({
+        path: 'favorites', // populate 'favorites' to MovieModel
+        populate: ['genres', 'actors'], // populate 'genres' and 'actors' in MovieModel
+      })
+      .then((data) => data.favorites);
   }
 
   async deleteUser(_id: string): Promise<UserModel | null> {

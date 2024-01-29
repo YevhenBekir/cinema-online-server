@@ -1,5 +1,7 @@
 import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
-import { prop } from '@typegoose/typegoose';
+import { Ref, prop } from '@typegoose/typegoose';
+
+import { MovieModel } from '../movie/movie.model';
 
 export interface UserModel extends Base {
   // Model with the same name will extend this interface, this interface extends base for set '_id' field to collection from model
@@ -19,6 +21,6 @@ export class UserModel extends TimeStamps {
   @prop({ default: false })
   isAdmin?: boolean;
 
-  @prop({ default: [] })
-  favorites?: [];
+  @prop({ default: [], ref: () => MovieModel })
+  favorites?: Ref<MovieModel>[];
 }
