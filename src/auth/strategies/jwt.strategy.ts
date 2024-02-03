@@ -21,6 +21,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate({ _id }: Pick<UserModel, '_id'>) {
     // Method for check user in DB with '_id'. This method calls when jwtService.verifyAsync(refreshToken). '_id' passed from token token during verify.
-    return await this.userModel.findById(_id).exec();
+    return await this.userModel.findById(_id);
   }
 }

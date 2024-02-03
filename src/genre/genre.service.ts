@@ -36,7 +36,7 @@ export class GenreService {
   }
 
   async getCount(): Promise<number> {
-    return await this.genreModel.find().countDocuments().exec();
+    return await this.genreModel.find().countDocuments();
   }
 
   async getAll(searchTerm: string = ''): Promise<GenreDto[]> {
@@ -120,6 +120,6 @@ export class GenreService {
   }
 
   async delete(_id: string): Promise<GenreModel> {
-    return await this.genreModel.findByIdAndDelete(_id).exec();
+    return await this.genreModel.findByIdAndDelete(_id);
   }
 }

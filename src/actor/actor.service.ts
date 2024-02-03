@@ -124,6 +124,6 @@ export class ActorService {
   }
 
   async delete(_id: string): Promise<ActorModel> {
-    return await this.actorModel.findByIdAndDelete(_id).exec();
+    return await this.actorModel.findByIdAndDelete(_id);
   }
 }

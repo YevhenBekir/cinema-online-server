@@ -192,7 +192,19 @@ export class MovieService {
     return new MovieDto(movie);
   }
 
+  async updateMovieRating(_id: Types.ObjectId, newRating: number): Promise<MovieDto> {
+    const movie = await this.movieModel.findByIdAndUpdate(
+      _id,
+      {
+        rating: newRating,
+      },
+      { new: true },
+    );
+
+    return new MovieDto(movie);
+  }
+
   async delete(_id: Types.ObjectId): Promise<MovieModel> {
-    return await this.movieModel.findByIdAndDelete(_id).exec();
+    return await this.movieModel.findByIdAndDelete(_id);
   }
 }

@@ -5,6 +5,7 @@ import { MovieController } from './movie.controller';
 import { MovieService } from './movie.service';
 import { MovieModel } from './movie.model';
 import { FileService } from '../file/file.service';
+import { FileModule } from 'src/file/file.module';
 
 @Module({
   imports: [
@@ -16,8 +17,10 @@ import { FileService } from '../file/file.service';
         },
       },
     ]),
+    FileModule,
   ],
   controllers: [MovieController],
-  providers: [MovieService, FileService],
+  providers: [MovieService],
+  exports: [MovieService], // Giving access to MovieService from foreign Module
 })
 export class MovieModule {}

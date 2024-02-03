@@ -51,7 +51,7 @@ export class UserService {
   }
 
   async getUsersCount(): Promise<number> {
-    return await this.userModel.find().countDocuments().exec();
+    return await this.userModel.find().countDocuments();
   }
 
   async getProfile(_id: Types.ObjectId): Promise<UserDto> {
@@ -70,12 +70,9 @@ export class UserService {
       };
     }
 
-    const result: UserModel[] = await this.userModel
-      .find(filter)
-      .sort({
-        createdAt: 'desc', // Sorting for new users
-      })
-      .exec();
+    const result: UserModel[] = await this.userModel.find(filter).sort({
+      createdAt: 'desc', // Sorting for new users
+    });
 
     if (!result.length) {
       throw new NotFoundException('No users found !');
@@ -133,6 +130,6 @@ export class UserService {
   }
 
   async deleteUser(_id: string): Promise<UserModel | null> {
-    return await this.userModel.findByIdAndDelete(_id).exec();
+    return await this.userModel.findByIdAndDelete(_id);
   }
 }

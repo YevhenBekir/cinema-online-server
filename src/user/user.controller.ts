@@ -44,6 +44,7 @@ export class UserController {
   @Get('/profile/:_userId')
   @Auth('admin')
   async getUserProfile(@Param('_userId', IdValidationPipe) _userId: Types.ObjectId) {
+    // Get user's profile by admin
     return await this.userService.getProfile(_userId);
   }
 
