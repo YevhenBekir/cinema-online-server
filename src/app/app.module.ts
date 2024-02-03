@@ -2,17 +2,17 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypegooseModule } from 'nestjs-typegoose';
 
-import { getDatabaseConfig } from './config/db.config';
+import { getDatabaseConfig } from '../common/config/db.config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
-import { GenreModule } from './genre/genre.module';
-import { FileModule } from './file/file.module';
-import { ActorModule } from './actor/actor.module';
-import { MovieModule } from './movie/movie.module';
-import { RatingModule } from './rating/rating.module';
+import { AuthModule } from '../auth/auth.module';
+import { UserModule } from '../user/user.module';
+import { GenreModule } from '../genre/genre.module';
+import { FileModule } from '../file/file.module';
+import { ActorModule } from '../actor/actor.module';
+import { MovieModule } from '../movie/movie.module';
+import { RatingModule } from '../rating/rating.module';
 
 @Module({
   imports: [

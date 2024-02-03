@@ -1,12 +1,12 @@
 import { Body, Controller, Get, HttpCode, Param, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 
 import { RatingService } from './rating.service';
-import { Auth } from 'src/auth/decorators/auth.decorator';
+import { Auth } from 'src/common/decorators/auth.decorator';
 import { SetRatingDto } from './dto/setRating.dto';
-import { IdValidationPipe } from 'src/pipes/id.validation.pipe';
+import { IdValidationPipe } from 'src/common/pipes/id.validation.pipe';
 import { Types } from 'mongoose';
 import { UserModel } from 'src/user/user.model';
-import { User } from 'src/user/decorators/user.decorator';
+import { User } from 'src/common/decorators/user.decorator';
 
 @Controller('rating')
 export class RatingController {

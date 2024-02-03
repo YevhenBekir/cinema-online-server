@@ -16,8 +16,8 @@ import {
 import { Types } from 'mongoose';
 
 import { MovieService } from './movie.service';
-import { Auth } from '../auth/decorators/auth.decorator';
-import { IdValidationPipe } from 'src/pipes/id.validation.pipe';
+import { Auth } from '../common/decorators/auth.decorator';
+import { IdValidationPipe } from 'src/common/pipes/id.validation.pipe';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CreateMovieDto } from './dto/createMovie.dto';
 import { UpdateMovieDto } from './dto/updateMovie.dto';

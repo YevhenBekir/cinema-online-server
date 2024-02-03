@@ -17,8 +17,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 
 import { ActorService } from './actor.service';
 import { CreateActorDto } from './dto/createActor.dto';
-import { Auth } from '../auth/decorators/auth.decorator';
-import { IdValidationPipe } from '../pipes/id.validation.pipe';
+import { Auth } from '../common/decorators/auth.decorator';
+import { IdValidationPipe } from '../common/pipes/id.validation.pipe';
 
 @Controller('actors')
 export class ActorController {

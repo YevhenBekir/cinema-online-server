@@ -13,9 +13,9 @@ import {
 } from '@nestjs/common';
 
 import { GenreService } from './genre.service';
-import { Auth } from '../auth/decorators/auth.decorator';
+import { Auth } from '../common/decorators/auth.decorator';
 import { GenreDto } from './dto/genre.dto';
-import { IdValidationPipe } from '../pipes/id.validation.pipe';
+import { IdValidationPipe } from '../common/pipes/id.validation.pipe';
 import { UpdateGenreDto } from './dto/updateGenre.dto';
 
 @Controller('genres')

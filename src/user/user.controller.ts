@@ -12,10 +12,10 @@ import {
 } from '@nestjs/common';
 
 import { UserService } from './user.service';
-import { Auth } from '../auth/decorators/auth.decorator';
-import { User } from './decorators/user.decorator';
+import { Auth } from '../common/decorators/auth.decorator';
+import { User } from '../common/decorators/user.decorator';
 import { UserUpdateDto } from './dto/userUpdate.dto';
-import { IdValidationPipe } from 'src/pipes/id.validation.pipe';
+import { IdValidationPipe } from 'src/common/pipes/id.validation.pipe';
 import { Types } from 'mongoose';
 import { UserModel } from './user.model';
 
