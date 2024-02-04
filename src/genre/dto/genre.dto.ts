@@ -1,9 +1,12 @@
 import { IsString, IsBoolean, IsOptional } from 'class-validator';
+import { IsObjectId } from 'class-validator-mongo-object-id';
+import { Types } from 'mongoose';
+
 import { GenreModel } from '../genre.model';
 
 export class GenreDto {
-  @IsString()
-  id: string;
+  @IsObjectId()
+  id: Types.ObjectId;
 
   @IsString()
   name: string;
@@ -24,7 +27,7 @@ export class GenreDto {
   isSensitive: boolean;
 
   constructor(genreModel: GenreModel) {
-    this.id = String(genreModel._id);
+    this.id = genreModel._id;
     this.name = genreModel.name;
     this.slug = genreModel.slug;
     this.description = genreModel.description;

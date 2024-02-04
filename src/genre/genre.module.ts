@@ -5,6 +5,7 @@ import { TypegooseModule } from 'nestjs-typegoose';
 import { GenreController } from './genre.controller';
 import { GenreService } from './genre.service';
 import { GenreModel } from './genre.model';
+import { MovieModule } from 'src/movie/movie.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { GenreModel } from './genre.model';
       },
     ]),
     ConfigModule,
+    MovieModule,
   ],
   controllers: [GenreController],
   providers: [GenreService],

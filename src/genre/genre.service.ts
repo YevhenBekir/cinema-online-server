@@ -6,10 +6,15 @@ import { Document } from 'mongoose';
 import { GenreModel } from './genre.model';
 import { GenreDto } from './dto/genre.dto';
 import { UpdateGenreDto } from './dto/updateGenre.dto';
+import { MovieService } from 'src/movie/movie.service';
+import { Collection } from './genre.interface';
 
 @Injectable()
 export class GenreService {
-  constructor(@InjectModel(GenreModel) private readonly genreModel: ModelType<GenreModel>) {}
+  constructor(
+    @InjectModel(GenreModel) private readonly genreModel: ModelType<GenreModel>,
+    private readonly movieService: MovieService,
+  ) {}
 
   private async findGenre(searchTerm: string): Promise<boolean> {
     let filter: object = {};
@@ -63,11 +68,24 @@ export class GenreService {
     return genres.map((genre) => new GenreDto(genre));
   }
 
-  async getCollections() {
+  async getCollections(): Promise<Collection[]> {
     const genres: GenreDto[] = await this.getAll();
 
-    // TODO: Need to collections return
-    let collections = genres;
+    const collections: Collection[] = await Promise.all(
+      genres.map(async (genre) => {
+        const moviesByGenre = await this.movieService.byGenreIds([genre.id]);
+
+        // Create collections of existing genres
+        const moviesCollection: Collection = {
+          id: genre.id,
+          image: moviesByGenre[0].widePoster, // Main title of collection
+          slug: genre.slug,
+          title: genre.name,
+        };
+
+        return moviesCollection;
+      }),
+    );
 
     return collections;
   }
