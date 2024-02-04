@@ -6,6 +6,7 @@ import { MovieService } from './movie.service';
 import { MovieModel } from './movie.model';
 import { FileService } from '../file/file.service';
 import { FileModule } from 'src/file/file.module';
+import { TelegramModule } from 'src/telegram/telegram.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { FileModule } from 'src/file/file.module';
       },
     ]),
     FileModule,
+    TelegramModule,
   ],
   controllers: [MovieController],
   providers: [MovieService],

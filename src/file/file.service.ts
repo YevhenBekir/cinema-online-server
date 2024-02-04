@@ -42,7 +42,18 @@ export class FileService {
   async deleteFile(filePath: string): Promise<void> {
     if (filePath) {
       try {
-        return await fs.unlink(`${path}${filePath}`);
+        const fullPath = `${path}${filePath}`;
+
+        const fileExists = await fs
+          .access(fullPath)
+          .then(() => true)
+          .catch(() => false);
+
+        if (fileExists) {
+          return await fs.unlink(fullPath);
+        } else {
+          console.log(`File ${fullPath} does not exist.`);
+        }
       } catch (error) {
         throw error;
       }

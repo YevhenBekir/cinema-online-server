@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectModel } from 'nestjs-typegoose';
 import { ModelType } from '@typegoose/typegoose/lib/types';
 import { Types } from 'mongoose';
+import { path } from 'app-root-path';
 
 import { MovieModel } from './movie.model';
 import { MovieDto } from './dto/movie.dto';
@@ -9,12 +10,14 @@ import { CreateMovieDto } from './dto/createMovie.dto';
 import { FileResponse } from '../file/file.interface';
 import { FileService } from '../file/file.service';
 import { UpdateMovieDto } from './dto/updateMovie.dto';
+import { TelegramService } from '../telegram/telegram.service';
 
 @Injectable()
 export class MovieService {
   constructor(
     @InjectModel(MovieModel) private readonly movieModel: ModelType<MovieModel>,
     private readonly fileService: FileService,
+    private readonly telegramService: TelegramService,
   ) {}
 
   private isFoundMovies(movies: MovieModel[]): void {
@@ -135,9 +138,12 @@ export class MovieService {
     });
     await movie.save();
 
-    // TODO: create telegram notification
+    const createdMovieDTO = new MovieDto(movie);
+    if (createdMovieDTO.isPublicToTelegram) {
+      await this.sendTelegramNotification(createdMovieDTO);
+    }
 
-    return new MovieDto(movie);
+    return createdMovieDTO;
   }
 
   async getMostPopular(): Promise<MovieDto[]> {
@@ -154,8 +160,6 @@ export class MovieService {
   }
 
   async update(_id: Types.ObjectId, movieDTO: UpdateMovieDto): Promise<MovieDto> {
-    // TODO: create telegram notification
-
     const movie = await this.movieModel.findById(_id);
     if (!movie) {
       throw new NotFoundException('Movie not found !');
@@ -189,7 +193,13 @@ export class MovieService {
 
     await movie.save();
 
-    return new MovieDto(movie);
+    const updatedMovieDTO = new MovieDto(movie);
+
+    if (updatedMovieDTO.isPublicToTelegram) {
+      await this.sendTelegramNotification(updatedMovieDTO, true);
+    }
+
+    return updatedMovieDTO;
   }
 
   async updateMovieRating(_id: Types.ObjectId, newRating: number): Promise<MovieDto> {
@@ -202,6 +212,32 @@ export class MovieService {
     );
 
     return new MovieDto(movie);
+  }
+
+  async sendTelegramNotification(dto: MovieDto, updated?: boolean): Promise<boolean> {
+    const message: string = updated ? `${dto.title} - UPDATED` : dto.title;
+
+    // Send image only in production environment
+    if (process.env.NODE_ENV !== 'development') {
+      const imagePath = `${path}${dto.poster}`;
+      await this.telegramService.sendPhoto(imagePath);
+    }
+
+    // Create button which can redirect user to anywhere
+    await this.telegramService.sendMessage(message, {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              url: 'https://www.linkedin.com/in/yevhenbekir/',
+              text: 'Welcome to my LinkedIn !',
+            },
+          ],
+        ],
+      },
+    });
+
+    return true;
   }
 
   async delete(_id: Types.ObjectId): Promise<MovieModel> {
