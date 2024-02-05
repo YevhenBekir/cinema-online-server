@@ -106,7 +106,7 @@ export class GenreService {
   }
 
   async create({ name, description, slug, icon, isSensitive }: GenreDto): Promise<GenreDto> {
-    const isExist: boolean = await this.findGenre(name);
+    const isExist: boolean = await this.genreModel.findOne({ name, slug });
     if (isExist) {
       throw new BadRequestException(`${name} genre already exist !`);
     }
@@ -118,7 +118,7 @@ export class GenreService {
 
     if (description) genre.description = description;
     if (icon) genre.icon = icon;
-    if (isSensitive) genre.isSensitive = isSensitive;
+    if (isSensitive || isSensitive === false) genre.isSensitive = isSensitive;
     await genre.save();
 
     return new GenreDto(genre);

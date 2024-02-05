@@ -55,7 +55,7 @@ export class AuthService {
 
     const user = new this.userModel({
       email: authDTO.email,
-      name: authDTO.name,
+      name: authDTO.name ? authDTO.name : `User-${Math.floor(Math.random() * 1000000) + 1}`,
       password: hashPassword,
     });
     await user.save();
