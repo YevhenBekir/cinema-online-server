@@ -15,10 +15,10 @@ export class FileService {
     const result: FileResponse[] = await Promise.all(
       // Mapping files in Promise.all from await each of iteration
       files.map(async (file) => {
-        await writeFile(`${uploadFolder}/${file.originalname}`, file.buffer); // Writing file on file system
+        await writeFile(`${uploadFolder}/${file.originalname.replace(/\s/g, '_')}`, file.buffer); // Writing file on file system
 
         return {
-          url: `/uploads/${folder}/${file.originalname}`,
+          url: `/uploads/${folder}/${file.originalname.replace(/\s/g, '_')}`,
           name: file.originalname,
         };
       }),
@@ -31,10 +31,10 @@ export class FileService {
     const uploadFolder: string = `${path}/uploads/${folder}`;
 
     await ensureDir(uploadFolder);
-    await writeFile(`${uploadFolder}/${file.originalname}`, file.buffer);
+    await writeFile(`${uploadFolder}/${file.originalname.replace(/\s/g, '_')}`, file.buffer);
 
     return {
-      url: `/uploads/${folder}/${file.originalname}`,
+      url: `/uploads/${folder}/${file.originalname.replace(/\s/g, '_')}`,
       name: file.originalname,
     };
   }
